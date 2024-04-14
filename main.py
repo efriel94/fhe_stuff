@@ -69,16 +69,25 @@ def decrypt(u,v,secret_key,q):
 def main():
 
     print(f"message: {plaintext_message} \n")
-    a,b,secret_key = generate_lwe_instance(q,n,N,sigma)
-    u,v = enrypt(plaintext_message,a,b,q,N)
 
+    # generate lwe instance which is a public key (A,b) and private key (secret_key)
+    a,b,secret_key = generate_lwe_instance(q,n,N,sigma)
+
+    # encrypt message which outputs a tuple
+    u,v = enrypt(plaintext_message,a,b,q,N)
     print("ciphertext: ")
     print(f"u: {u}\n")
     print(f"v: {v}\n")
 
+    # decrypt message
     m = decrypt(u,v,secret_key,q)
+    print(f"decrypted: {m}\n")
 
-    print(f"decrypted: {m}")
+    # compare plaintext and decrypted message
+    if np.array_equal(m,plaintext_message):
+        print("Successful decryption")
+    else:
+        print("Insuccess decryption")
 
 
 if __name__ == "__main__":
