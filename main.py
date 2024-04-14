@@ -35,7 +35,7 @@ def generate_lwe_instance(q,n,N,sigma):
 
 
 # encrypt,single bit message m E {0,1} , sk -> (u,v)
-def enrypt(data, A, b, q, N):
+def encrypt(data, A, b, q, N):
     # Sample a random binary vector r{0,1} of size N 
     r = np.random.randint(0,2,N)
 
