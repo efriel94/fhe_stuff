@@ -73,7 +73,7 @@ def main():
     # generate lwe instance which is a public key (A,b) and private key (secret_key)
     a,b,secret_key = generate_lwe_instance(q,n,N,sigma)
 
-    # encrypt message which outputs a tuple
+    # encrypt message
     u,v = encrypt(plaintext_message,a,b,q,N)
     print("ciphertext: ")
     print(f"u: {u}\n")
@@ -85,7 +85,7 @@ def main():
 
     # compare plaintext and decrypted message
     if np.array_equal(m,plaintext_message):
-        print("Successful decryption")
+        print("Successful decryption\n")
     else:
         print("Insuccess decryption")
 
