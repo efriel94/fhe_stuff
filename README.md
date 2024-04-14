@@ -1,2 +1,2 @@
 # lwe_python
-PKE Learning with Errors in Python  
+Simple Public Key Encryption implementation with Learning with Errors in Python  
