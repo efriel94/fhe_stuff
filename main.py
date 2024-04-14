@@ -3,13 +3,13 @@ import numpy as np
 # set LWE parameters
 n = 4         # security parameter
 N = 7         # sample size
-q = 31          # modulus
-sigma = 1.0      # std deviation of the noise distribution
+q = 31        # modulus
+sigma = 1.0   # std deviation of the noise distribution
 
 plaintext_message = np.random.randint(0,2,20)
 print(f"plaintext: {plaintext_message}\n")
 
-# generate LWE keypair (pk,sk)  -> ((A,b),sk)    
+# Create LWE keypair (public_key,secret_key)     
 def generate_lwe_instance(q,n,N,sigma):
 
     # Create A matrix of uniform distribution over Zq of size Nxn
