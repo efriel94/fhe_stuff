@@ -6,23 +6,22 @@ N = 7         # sample size
 q = 31        # modulus
 sigma = 1.0   # std deviation of the noise distribution
 
-plaintext_message = np.random.randint(0,2,20)
-print(f"plaintext: {plaintext_message}\n")
 
 # Create LWE keypair (public_key,secret_key)     
 def generate_lwe_instance(q,n,N,sigma):
 
     # Sample a random A matrix of uniform distribution over Zq of size Nxn
-    A = np.random.randint(0, q, size=(N, n))
+    A = np.random.uniform(0, q, size=(N, n)).astype(int)
 
     # Sample a random error vector from a discrete gaussian distribution over Zq of size N
+    # Convert to int
     e = np.random.normal(loc=0, scale=sigma, size=N)
     e = np.round(e)
     e = np.mod(e,q)
     e = e.astype(int)
 
     # Sample a random secret vector of uniform distribution of size n over [0,q-1]
-    sk = np.random.randint(0, q-1,size=n)
+    sk = np.random.uniform(0, q-1,size=n).astype(int)
 
     # Compute As
     As = np.dot(A,sk)
@@ -68,7 +67,11 @@ def decrypt(u,v,secret_key,q):
 
 def main():
 
-    print(f"message: {plaintext_message} \n")
+    #plaintext_message = "Hello World"
+    #plaintext_message.encode()   
+    
+    plaintext_message = np.random.randint(0,2,20)
+    print(f"plaintext: {plaintext_message}\n")
 
     # generate lwe instance which is a public key (A,b) and private key (secret_key)
     a,b,secret_key = generate_lwe_instance(q,n,N,sigma)
