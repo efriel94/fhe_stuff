@@ -73,7 +73,7 @@ def main():
     a,b,secret_key = generate_lwe_instance(q,n,N,sigma)
 
     # encrypt message which outputs a tuple
-    u,v = enrypt(plaintext_message,a,b,q,N)
+    u,v = encrypt(plaintext_message,a,b,q,N)
     print("ciphertext: ")
     print(f"u: {u}\n")
     print(f"v: {v}\n")
