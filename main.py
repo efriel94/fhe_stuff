@@ -3,8 +3,8 @@ import numpy as np
 # set LWE parameters
 n = 4         # security parameter
 N = 7         # sample size
-q = 31        # modulus
-sigma = 1.0   # std deviation of the noise distribution
+q = 31          # modulus
+sigma = 1.0      # std deviation of the noise distribution
 
 plaintext_message = np.random.randint(0,2,20)
 print(f"plaintext: {plaintext_message}\n")
@@ -15,13 +15,13 @@ def generate_lwe_instance(q,n,N,sigma):
     # Create A matrix of uniform distribution over Zq of size Nxn
     A = np.random.randint(0, q, size=(N, n))
 
-    # Create noise vector, sample error distribution from a discrete gaussian distribution over Zq
+    # Create noise vector, sample error distribution from a discrete gaussian distribution over Zq of size N
     e = np.random.normal(loc=0, scale=sigma, size=N)
     e = np.round(e)
     e = np.mod(e,q)
     e = e.astype(int)
 
-    # Create sk vector of size n over [0,q-1]
+    # Create a random secret vector of size n over [0,q-1]
     sk = np.random.randint(0, q-1,size=n)
 
     # Compute As
@@ -30,15 +30,15 @@ def generate_lwe_instance(q,n,N,sigma):
     # Compute b = (As + e) mod q
     b = np.mod(As + e,q)
 
-    # return A,b,sk
+    # return public key (A,b) and secret key (sk)
     return A,b,sk
 
 
-# encrypt,single bit message m E {0,1} , sk -> (u,v)
+# Encrypt each bit message m within the set {0,1}
 def encrypt(data, A, b, q, N):
+    
     # Sample a random binary vector r{0,1} of size N 
     r = np.random.randint(0,2,N)
-    print(f"random r: {r}\n")
 
     # Compute u=AT*r  (AT is A matrix transposed)
     u = np.dot(np.transpose(A), r)
@@ -50,7 +50,7 @@ def encrypt(data, A, b, q, N):
     return u,v
 
 
-# decrypt (message,sk,q,n,N)
+# decrypt ciphertext and compare plaintext to decrypted
 def decrypt(u,v,secret_key,q):
 
     # Compute v' = sT * u
@@ -59,7 +59,8 @@ def decrypt(u,v,secret_key,q):
     # Compute d = v - v'
     d = v - v_
 
-    # Compute m = [2d/q] mod 2, where ⌈x⌋ denotes rounding x to the nearest integer with ties being rounded up (note x is not reduced modulo q
+    # Compute m = [2d/q] mod 2, where ⌈x⌋ denotes rounding x to the nearest integer with ties being rounded up 
+    # (note x is not reduced modulo q)
     m = np.mod(np.round((2*d)/q),2)
     return m
 
