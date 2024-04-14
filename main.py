@@ -12,16 +12,16 @@ print(f"plaintext: {plaintext_message}\n")
 # Create LWE keypair (public_key,secret_key)     
 def generate_lwe_instance(q,n,N,sigma):
 
-    # Create A matrix of uniform distribution over Zq of size Nxn
+    # Sample a random A matrix of uniform distribution over Zq of size Nxn
     A = np.random.randint(0, q, size=(N, n))
 
-    # Create noise vector, sample error distribution from a discrete gaussian distribution over Zq of size N
+    # Sample a random error vector from a discrete gaussian distribution over Zq of size N
     e = np.random.normal(loc=0, scale=sigma, size=N)
     e = np.round(e)
     e = np.mod(e,q)
     e = e.astype(int)
 
-    # Create a random secret vector of size n over [0,q-1]
+    # Sample a random secret vector of uniform distribution of size n over [0,q-1]
     sk = np.random.randint(0, q-1,size=n)
 
     # Compute As
@@ -34,7 +34,7 @@ def generate_lwe_instance(q,n,N,sigma):
     return A,b,sk
 
 
-# Encrypt each bit message m within the set {0,1}
+# Encrypt each message bit
 def encrypt(data, A, b, q, N):
     
     # Sample a random binary vector r{0,1} of size N 
@@ -50,7 +50,7 @@ def encrypt(data, A, b, q, N):
     return u,v
 
 
-# decrypt ciphertext and compare plaintext to decrypted
+# Decrypt ciphertext
 def decrypt(u,v,secret_key,q):
 
     # Compute v' = sT * u
