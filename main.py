@@ -38,8 +38,7 @@ def generate_lwe_instance(q,n,N,sigma):
 def encrypt(data, A, b, q, N):
     # Sample a random binary vector r{0,1} of size N 
     r = np.random.randint(0,2,N)
-
-    print(f"randon r: {r}\n")
+    print(f"random r: {r}\n")
 
     # Compute u=AT*r  (AT is A matrix transposed)
     u = np.dot(np.transpose(A), r)
