@@ -8,7 +8,7 @@ sigma = 1.0   # std deviation of the noise distribution
 
 
 # Create LWE keypair (public_key,secret_key)     
-def generate_lwe_instance(q,n,N,sigma):
+def generate_lwe_instance(q:int, n:int, N:int, sigma:float) -> tuple:
 
     # Sample a random A matrix of uniform distribution over Zq of size Nxn
     A = np.random.uniform(0, q, size=(N, n)).astype(int)
@@ -34,7 +34,7 @@ def generate_lwe_instance(q,n,N,sigma):
 
 
 # Encrypt each message bit
-def encrypt(data, A, b, q, N):
+def encrypt(data: np.ndarray, A: np.ndarray, b: np.ndarray, q: int, N: int) -> tuple:
     
     # Sample a random binary vector r{0,1} of size N 
     r = np.random.randint(0,2,N)
@@ -50,7 +50,7 @@ def encrypt(data, A, b, q, N):
 
 
 # Decrypt ciphertext
-def decrypt(u,v,secret_key,q):
+def decrypt(u:np.ndarray, v:np.ndarray, secret_key:np.ndarray, q:int) -> np.ndarray:
 
     # Compute v' = sT * u
     v_ = np.dot(np.transpose(secret_key), u)
@@ -63,15 +63,19 @@ def decrypt(u,v,secret_key,q):
     m = np.mod(np.round((2*d)/q),2)
     return m
 
-def convert_string_to_numpy(data: str):
+# Convert string to numpy.ndarray
+def convert_string_to_numpy(data: str) -> np.ndarray:
+
     # Convert string to binary representation
     binary_string = ''.join(format(ord(char), '08b') for char in data)
+    
     # Convert binary string to NumPy array of 1's and 0's
     binary_array = np.array([int(bit) for bit in binary_string])
     return binary_array
 
 
-def convert_numpy_to_string(data):
+# Convert numpy.ndarray to letters
+def convert_numpy_to_string(data: np.ndarray) -> str:
     binary_string = ''.join(map(str, data))
     output_string = ''.join(chr(int(binary_string[i:i+8], 2)) for i in range(0, len(binary_string), 8))
     return output_string
