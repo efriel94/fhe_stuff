@@ -13,12 +13,9 @@ def generate_lwe_instance(q:int, n:int, N:int, sigma:float) -> tuple:
     # Sample a random A matrix of uniform distribution over Zq of size Nxn
     A = np.random.uniform(0, q, size=(N, n)).astype(int)
 
-    # Sample a random error vector from a discrete gaussian distribution over Zq of size N
-    # Convert to int
-    e = np.random.normal(loc=0, scale=sigma, size=N)
-    e = np.round(e)
+    # Sample a random error vector from a discrete gaussian distribution over Zq of size N 
+    e = np.random.normal(loc=0, scale=sigma, size=N).astype(int)
     e = np.mod(e,q)
-    e = e.astype(int)
 
     # Sample a random secret vector of uniform distribution of size n over [0,q-1]
     sk = np.random.uniform(0, q-1,size=n).astype(int)
@@ -76,6 +73,10 @@ def convert_string_to_numpy(data: str) -> np.ndarray:
 
 # Convert numpy.ndarray to letters
 def convert_numpy_to_string(data: np.ndarray) -> str:
+
+    # convert array to ints
+    data = data.astype(int)
+
     binary_string = ''.join(map(str, data))
     output_string = ''.join(chr(int(binary_string[i:i+8], 2)) for i in range(0, len(binary_string), 8))
     return output_string
@@ -86,7 +87,7 @@ def convert_numpy_to_string(data: np.ndarray) -> str:
 def main():
 
     # plaintext message to encrypt
-    plaintext_message = "My name is Emmet"
+    plaintext_message = "***** !! PKE - Learning with Errors !! *****"
     plaintext_message_bytes = convert_string_to_numpy(plaintext_message)   # convert to bytearray
     print(f"Plaintext message: {plaintext_message}\n")
 
@@ -101,8 +102,7 @@ def main():
 
     # decrypt message
     m_np = decrypt(u,v,secret_key,q)
-    m_int = m_np.astype(int)
-    decrypted_msg = convert_numpy_to_string(m_int)
+    decrypted_msg = convert_numpy_to_string(m_np)
     print(f"Decrypted message: {decrypted_msg}\n")
 
     # compare plaintext and decrypted message
