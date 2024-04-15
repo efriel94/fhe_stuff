@@ -63,31 +63,50 @@ def decrypt(u,v,secret_key,q):
     m = np.mod(np.round((2*d)/q),2)
     return m
 
+def convert_string_to_numpy(data: str):
+    # Convert string to binary representation
+    binary_string = ''.join(format(ord(char), '08b') for char in data)
+    # Convert binary string to NumPy array of 1's and 0's
+    binary_array = np.array([int(bit) for bit in binary_string])
+    return binary_array
+
+
+def convert_numpy_to_string(data):
+    binary_string = ''.join(map(str, data))
+    output_string = ''.join(chr(int(binary_string[i:i+8], 2)) for i in range(0, len(binary_string), 8))
+    return output_string
+
+
 
 
 def main():
 
-    #plaintext_message = "Hello World"
-    #plaintext_message.encode()   
-    
-    plaintext_message = np.random.randint(0,2,20)
-    print(f"plaintext: {plaintext_message}\n")
+    # convert message to numpy array
+    plaintext_message = "My name is Emmet"
+    plaintext_message_bytes = convert_string_to_numpy(plaintext_message)
+
+    #plaintext_message = np.random.randint(0,2,20)
+    print(f"Plaintext message: {plaintext_message}\n")
 
     # generate lwe instance which is a public key (A,b) and private key (secret_key)
     a,b,secret_key = generate_lwe_instance(q,n,N,sigma)
 
     # encrypt message
-    u,v = encrypt(plaintext_message,a,b,q,N)
+    u,v = encrypt(plaintext_message_bytes,a,b,q,N)
     print("ciphertext: ")
     print(f"u: {u}\n")
     print(f"v: {v}\n")
 
     # decrypt message
-    m = decrypt(u,v,secret_key,q)
-    print(f"decrypted: {m}\n")
+    m_np = decrypt(u,v,secret_key,q)
+    m_int = m_np.astype(int)
+    decrypted_msg = convert_numpy_to_string(m_int)
+
+    # decrypt
+    print(f"Decrypted message: {decrypted_msg}\n")
 
     # compare plaintext and decrypted message
-    if np.array_equal(m,plaintext_message):
+    if np.array_equal(m_np,plaintext_message_bytes):
         print("Successful decryption\n")
     else:
         print("Insuccess decryption")
