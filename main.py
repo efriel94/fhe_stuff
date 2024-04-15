@@ -81,11 +81,9 @@ def convert_numpy_to_string(data):
 
 def main():
 
-    # convert message to numpy array
+    # plaintext message to encrypt
     plaintext_message = "My name is Emmet"
-    plaintext_message_bytes = convert_string_to_numpy(plaintext_message)
-
-    #plaintext_message = np.random.randint(0,2,20)
+    plaintext_message_bytes = convert_string_to_numpy(plaintext_message)   # convert to bytearray
     print(f"Plaintext message: {plaintext_message}\n")
 
     # generate lwe instance which is a public key (A,b) and private key (secret_key)
@@ -101,8 +99,6 @@ def main():
     m_np = decrypt(u,v,secret_key,q)
     m_int = m_np.astype(int)
     decrypted_msg = convert_numpy_to_string(m_int)
-
-    # decrypt
     print(f"Decrypted message: {decrypted_msg}\n")
 
     # compare plaintext and decrypted message
