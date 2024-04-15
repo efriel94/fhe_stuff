@@ -33,14 +33,15 @@ def generate_lwe_instance(q:int, n:int, N:int, sigma:float) -> tuple:
 # Encrypt each message bit
 def encrypt(data: np.ndarray, A: np.ndarray, b: np.ndarray, q: int, N: int) -> tuple:
     
-    # Sample a random binary vector r{0,1} of size N 
+    # Sample a random binary vector r mod 2 of size N 
     r = np.random.randint(0,2,N)
 
     # Compute u=AT*r  (AT is A matrix transposed)
     u = np.dot(np.transpose(A), r)
 
     # Compute v=bTr+⌊q/2⌋m 
-    v = np.dot(np.transpose(b),r) + np.dot(np.round(q/2),data)
+    # note [x] denotes rounding x to the nearest integer, x is not reduced mod q
+    v = np.dot(np.transpose(b),r) + (np.round(q/2) * data)
 
     # Output the ciphertext c=(u,v)
     return u,v
@@ -55,8 +56,7 @@ def decrypt(u:np.ndarray, v:np.ndarray, secret_key:np.ndarray, q:int) -> np.ndar
     # Compute d = v - v'
     d = v - v_
 
-    # Compute m = [2d/q] mod 2, where ⌈x⌋ denotes rounding x to the nearest integer with ties being rounded up 
-    # (note x is not reduced modulo q)
+    # Compute m = [2d/q] mod 2
     m = np.mod(np.round((2*d)/q),2)
     return m
 
