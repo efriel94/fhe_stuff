@@ -2,19 +2,19 @@ import numpy as np
 
 # set LWE parameters
 n = 4         # security parameter
-N = 7         # sample size
+m = 7         # sample size
 q = 31        # modulus
 sigma = 1.0   # std deviation of the noise distribution
 
 
 # Create LWE keypair (public_key,secret_key)     
-def generate_lwe_instance(q:int, n:int, N:int, sigma:float) -> tuple:
+def generate_lwe_instance(q:int, n:int, m:int, sigma:float) -> tuple:
 
-    # Sample a random A matrix of uniform distribution over Zq of size Nxn
-    A = np.random.uniform(0, q, size=(N, n)).astype(int)
+    # Sample a random A matrix of uniform distribution over Zq of size m x n
+    A = np.random.uniform(0, q, size=(m, n)).astype(int)
 
-    # Sample a random error vector from a discrete gaussian distribution over Zq of size N 
-    e = np.random.normal(loc=0, scale=sigma, size=N).astype(int)
+    # Sample a random error vector from a discrete gaussian distribution over Zq of size m 
+    e = np.random.normal(loc=0, scale=sigma, size=m).astype(int)
     e = np.mod(e,q)
 
     # Sample a random secret vector of uniform distribution of size n over [0,q-1]
@@ -31,15 +31,15 @@ def generate_lwe_instance(q:int, n:int, N:int, sigma:float) -> tuple:
 
 
 # Encrypt each message bit
-def encrypt(data: np.ndarray, A: np.ndarray, b: np.ndarray, q: int, N: int) -> tuple:
+def encrypt(data: np.ndarray, A: np.ndarray, b: np.ndarray, q: int, m: int) -> tuple:
     
-    # Sample a random binary vector r mod 2 of size N 
-    r = np.random.randint(0,2,N)
+    # Sample a random binary vector r mod 2 of size m 
+    r = np.random.randint(0,2,m)
 
     # Compute u=AT*r  (AT is A matrix transposed)
     u = np.dot(np.transpose(A), r)
 
-    # Compute v=bTr+⌊q/2⌋m 
+    # Compute v=bTr+⌊q/2⌋m
     # note [x] denotes rounding x to the nearest integer, x is not reduced mod q
     v = np.dot(np.transpose(b),r) + (np.round(q/2) * data)
 
@@ -92,7 +92,7 @@ def main():
     print(f"Plaintext message: {plaintext_message}\n")
 
     # generate lwe instance which is a public key (A,b) and private key (secret_key)
-    a,b,secret_key = generate_lwe_instance(q,n,N,sigma)
+    a,b,secret_key = generate_lwe_instance(q,n,m,sigma)
 
     # encrypt message
     u,v = encrypt(plaintext_message_bytes,a,b,q,N)
@@ -101,12 +101,12 @@ def main():
     print(f"v: {v}\n")
 
     # decrypt message
-    m_np = decrypt(u,v,secret_key,q)
-    decrypted_msg = convert_numpy_to_string(m_np)
+    result = decrypt(u,v,secret_key,q)
+    decrypted_msg = convert_numpy_to_string(result)
     print(f"Decrypted message: {decrypted_msg}\n")
 
     # compare plaintext and decrypted message
-    if np.array_equal(m_np,plaintext_message_bytes):
+    if np.array_equal(result,plaintext_message_bytes):
         print("Successful decryption\n")
     else:
         print("Insuccess decryption")
