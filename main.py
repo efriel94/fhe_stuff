@@ -95,7 +95,7 @@ def main():
     a,b,secret_key = generate_lwe_instance(q,n,m,sigma)
 
     # encrypt message
-    u,v = encrypt(plaintext_message_bytes,a,b,q,N)
+    u,v = encrypt(plaintext_message_bytes,a,b,q,m)
     print("ciphertext: ")
     print(f"u: {u}\n")
     print(f"v: {v}\n")
