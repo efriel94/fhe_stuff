@@ -86,6 +86,12 @@ def convert_numpy_to_string(data: np.ndarray) -> str:
 
 def main():
 
+    # set LWE parameters
+    n = 4         # security parameter
+    m = 7         # sample size
+    q = 31        # modulus
+    sigma = 1.0   # std deviation of the noise distribution
+
     # plaintext message to encrypt
     plaintext_message = "***** !! PKE - Learning with Errors !! *****"
     plaintext_message_bytes = convert_string_to_numpy(plaintext_message)   # convert to bytearray
