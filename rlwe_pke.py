@@ -36,7 +36,7 @@ def encrypt(sigma: float, public_key: tuple, n: int, q: int, t: int, poly_mod: n
     m = np.array([plaintext_message] + [0] * (n - 1), dtype=np.int64) % t
     print(f"Encoded message: {m}")
 
-    # scaling factor, used to scale from plaintext space up to the ciphertext space
+    # scaling factor, used to scale between plaintext space and ciphertext space
     delta = q // t
 
     # next step is to scale encoded polynominal coefficents in m up to the ciphertext space
@@ -87,7 +87,7 @@ if __name__ == "__main__":
     poly_mod = np.array([1] + [0] * (n - 1) + [1])  # polynomial modulus, this gives (x^15 + 1)
     sigma = 2.0         # std deviation of the noise distribution
 
-    plaintext = 299
+    plaintext = 200
 
     print(f"Polynominal modulus: {poly_mod}")
 
