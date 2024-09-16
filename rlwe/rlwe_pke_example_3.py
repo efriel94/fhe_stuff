@@ -1,15 +1,17 @@
 import numpy as np
 from numpy.polynomial import polynomial as poly
 
-def encode_string_to_polynominal(message: str, n: int, q: int, t: int) -> np.ndarray:
+def encode_string_to_polynominal(message: str, n: int, t: int) -> np.ndarray:
     """
-    Encode a string into a polynominal
+    Encode a string into the plaintext space
     """
-
+    
     # Convert each char to int and encode into plaintext space
+    polynominal_str = [ord(char) for char in message]
+    encoded_m = np.array([ord(char)] + [0] * (n - 1), dtype=np.int64) % t
+
     polynominal_str = list()
     for char in message:
-        encoded_m = np.array([ord(char)] + [0] * (n - 1), dtype=np.int64) % t
         polynominal_str.append(encoded_m)
     
     return polynominal_str
@@ -39,17 +41,24 @@ def keygen(n: int, q: int, poly_mod: np.ndarray, std_deviation: float) -> tuple:
 
 
 
-def encrypt(sigma: float, public_key: tuple, n: int, q: int, t: int, poly_mod: np.ndarray, polynominal_list: list) -> tuple:
+def encrypt(sigma: float, public_key: tuple, n: int, q: int, t: int, poly_mod: np.ndarray, message: str) -> tuple:
     """
     Encryption outputs a ciphertext containing two polynominals:
                         ct0=[pk0*u+e1+delta*m]q 
                         ct1=[pk1*u+e2]q
-    """
-    delta = q // t
 
-    for i in polynominal_list:
-        # next step is to scale encoded polynominal coefficents in m up to the ciphertext space
-        scaled_m = delta * i  % q
+    Noise is sampled across the entire polynominal not each character
+    """
+
+    # Convert message to ascii values
+    ascii_values = [ord(char) for char in message]
+    m = np.array(ascii_values + [0] * (n - len(ascii_values)), dtype=np.int64) % t
+    print(f"Encoded message as polynomial coefficients (mod {t}): {m}")
+    
+    # Step 3: Scale encoded polynomial coefficients into the ciphertext space
+    delta = q // t
+    scaled_m = (delta * m) % q
+    print(f"Scaled message in ciphertext space (mod {q}): {scaled_m}")
 
     # Sample random E1(x) and E2(x) polynominal coefficents over a discrete normal distribution of size n-1 
     e1 = np.int64(np.random.normal(loc=0, scale=sigma, size=n))
@@ -84,7 +93,11 @@ def decrypt(secret_key: np.ndarray, n: int, q: int, t: int, poly_mod: np.ndarray
     scaled_pt = np.int64(np.round(poly.polydiv(np.polyadd(ciphertext[0], ct1_sk) % q, poly_mod)[1] % q))
 
     decrypted_poly = np.int64(np.round(scaled_pt * t / q)) % t
-    return int(decrypted_poly[0])
+
+    # Step 4: Convert the decrypted polynomial to ASCII characters
+    # Assume coefficients represent ASCII values (mod 256)
+    decrypted_message = ''.join(chr(coef) for coef in decrypted_poly if coef != 0)
+    return decrypted_message
 
 
 if __name__ == "__main__":
@@ -96,30 +109,28 @@ if __name__ == "__main__":
     poly_mod = np.array([1] + [0] * (n - 1) + [1])  # polynomial modulus, this gives (x^15 + 1)
     sigma = 2.0         # std deviation of the noise distribution
 
-    plaintext_message = "Hello"
-    encode_string_to_polynominal(plaintext_message,q,t)
+    # Message 
+    plaintext_message = "Hello World"
 
+    # Generate LWE instance
+    public_key, secret_key = keygen(n,q,poly_mod,sigma)
+    print(f"(public key: {public_key}")
+    print(f"secret key: {secret_key}\n")
 
-    # print(f"Polynominal modulus: {poly_mod}")
+    # Encrypt message
+    ciphertext = encrypt(sigma, public_key, n, q, t, poly_mod, plaintext_message)
+    print(f"\nciphertext: {plaintext_message}")
+    print(f"\tct0: {ciphertext[0]}")
+    print(f"\tct0: {ciphertext[1]}")
 
-    # public_key, secret_key = keygen(n,q,poly_mod,sigma)
-    # print(f"(public key: {public_key}")
-    # print(f"secret key: {secret_key}\n")
+    # Decrypt
+    result = decrypt(secret_key,n,q,t,poly_mod,ciphertext)
+    print(f"Decrypted result: {result}")
 
-    # ciphertext_list = list()
-    # for i in random_list_np:
-    #     result = ciphertext_list.append(encrypt(sigma, public_key, n, q, t, poly_mod, i))
-    
-    # for i,j in enumerate(ciphertext_list):
-    #     print(f"ciphertext index {i} for plaintext {random_list_np[i]}: {j}")
+    # Assertion to check if plaintext and decrypted message are the same
+    assert plaintext_message == result, "Decryption failed! The decrypted message does not match the original."
+    print(f"Decryption successful.")
 
-    # # print(f"ciphertext: {plaintext}")
-    # # print(f"\tct0: {ciphertext[0]}")
-    # # print(f"\tct0: {ciphertext[1]}")
-
-    # for i,j in enumerate(ciphertext_list):
-    #     result = decrypt(secret_key,n,q,t,poly_mod,j)
-    #     print(f"decrypted result for {random_list_np[i]}: {result}")
 
 
 
