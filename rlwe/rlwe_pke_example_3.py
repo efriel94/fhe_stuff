@@ -1,20 +1,5 @@
 import numpy as np
 from numpy.polynomial import polynomial as poly
-
-def encode_string_to_polynominal(message: str, n: int, t: int) -> np.ndarray:
-    """
-    Encode a string into the plaintext space
-    """
-    
-    # Convert each char to int and encode into plaintext space
-    polynominal_str = [ord(char) for char in message]
-    encoded_m = np.array([ord(char)] + [0] * (n - 1), dtype=np.int64) % t
-
-    polynominal_str = list()
-    for char in message:
-        polynominal_str.append(encoded_m)
-    
-    return polynominal_str
         
 
 def keygen(n: int, q: int, poly_mod: np.ndarray, std_deviation: float) -> tuple:
